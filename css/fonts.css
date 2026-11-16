@@ -1,0 +1,5 @@
+/* 글꼴은 모두 이 폴더 안에 있다. 외부 서버를 쓰지 않는다. */
+@font-face{font-family:'Song Myung';font-weight:400;font-style:normal;font-display:block;src:url(../fonts/song-myung.woff2) format('woff2')}
+@font-face{font-family:'IM Fell';font-weight:400;font-style:normal;font-display:block;src:url(../fonts/im-fell-english.woff2) format('woff2')}
+@font-face{font-family:'IM Fell';font-weight:400;font-style:italic;font-display:block;src:url(../fonts/im-fell-english-i.woff2) format('woff2')}
+@font-face{font-family:'IM Fell DP';font-weight:400;font-style:italic;font-display:block;src:url(../fonts/im-fell-double-pica-i.woff2) format('woff2')}

@@ -1,0 +1,164 @@
+/* 마법 고서: 낡은 남색 가죽과 금박, 양피지, 촛불과 달빛이 만나는 책상 */
+:root{
+  --night:#030305;
+  --gold:#e3c27a;
+  --ink:#2f1d0d;            /* 지문 */
+  --ink-deep:#170b03;       /* 대사 */
+  --ink-blue:#2a4576;       /* 속마음: 푸른 잉크 */
+  --ui:#d9c69c;
+  --kr:'그리운 두준두준체','Griun_DUJUNDUJUN-Rg','Song Myung','Apple SD Gothic Neo',serif;
+  --latin:'IM Fell','Song Myung',serif;
+  --title:'IM Fell DP','IM Fell',serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--night);color:var(--ui);font-family:var(--kr);overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:#6b4a1c;color:#fff}
+
+#room{position:fixed;inset:0;background:var(--night);overflow:hidden}
+#stage{position:absolute;inset:0;display:grid;place-items:center;perspective:2400px;perspective-origin:50% 42%}
+#world{position:relative;width:0;height:0;transform-style:preserve-3d;will-change:transform}
+#world *{transform-style:preserve-3d}
+#world .flat,#world .flat *{transform-style:flat}
+
+/* 책상: 왼쪽 위 촛불, 오른쪽 창으로 드는 달빛 */
+#floor{position:absolute;width:calc(var(--dw)*2.4);height:calc(var(--dw)*1.5);left:calc(var(--dw)*-1.2);top:calc(var(--dw)*-.75);
+  background:radial-gradient(closest-side,#1d1008 34%,rgba(12,6,3,.7) 58%,transparent 86%);transform:translateZ(calc(var(--T)*-1 - 14px))}
+#desk{position:absolute;width:var(--dw);height:calc(var(--dw)*.5655);left:calc(var(--dw)*-.5);top:calc(var(--dw)*-.2828);
+  background:#120b06 url(../tex/desk.jpg) center/cover;transform:translateZ(calc(var(--T)*-1 - 10px));
+  -webkit-mask-image:radial-gradient(ellipse 76% 76% at 50% 50%,#000 78%,transparent 100%);mask-image:radial-gradient(ellipse 76% 76% at 50% 50%,#000 78%,transparent 100%)}
+#desk .glow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(42% 60% at 9% 10%,rgba(255,170,70,.34),rgba(255,150,50,.1) 45%,transparent 72%);animation:flick 5.2s infinite}
+@keyframes flick{0%,100%{opacity:.72}9%{opacity:.9}17%{opacity:.66}31%{opacity:.95}44%{opacity:.74}58%{opacity:1}69%{opacity:.7}83%{opacity:.92}}
+@media (prefers-reduced-motion:reduce){#desk .glow{animation:none}}
+
+#book{position:absolute;left:0;top:calc(var(--W)*-.5);width:0;height:var(--W);transform:translateX(var(--shift,0px));will-change:transform}
+#cast{position:absolute;top:5%;height:100%;left:calc(var(--castL)*1px);width:calc(var(--castW)*1px);
+  background:rgba(0,0,0,.72);filter:blur(calc(var(--W)*.05));transform:translateZ(calc(var(--T)*-1 - 6px)) translate(3.5%,3.5%);pointer-events:none}
+
+/* 좌우 책 더미 */
+.side{position:absolute;top:0;width:var(--W);height:var(--W)}
+.side.l{right:0}.side.r{left:0}
+.side .board{position:absolute;top:-1.5%;bottom:-1.5%;background:linear-gradient(160deg,#1c2540,#0d1222 70%);border-radius:calc(var(--W)*.008);
+  box-shadow:inset 0 0 0 1px rgba(190,140,80,.28);transform:translateZ(calc(var(--t)*-1 - 2px))}
+.side.l .board{left:calc(var(--t)*-.62 - 1.3%);right:0}
+.side.r .board{right:calc(var(--t)*-.62 - 1.3%);left:0}
+.side .edge{position:absolute;left:0;right:0;top:100%;height:var(--t);transform-origin:50% 0;transform:rotateX(-90deg);background:#dcc79b;
+  background-image:repeating-linear-gradient(0deg,rgba(96,66,28,.5) 0 1px,transparent 1px 2.3px),linear-gradient(180deg,transparent,rgba(20,10,2,.55))}
+.side .fan{position:absolute;top:.25%;bottom:-.1%;width:calc(var(--t)*.6);background:#d6c093;
+  background-image:repeating-linear-gradient(90deg,rgba(96,66,28,.55) 0 1px,transparent 1px 2.2px)}
+.side .fan::after{content:"";position:absolute;inset:0}
+.side.l .fan{right:100%;transform-origin:100% 50%;transform:rotateY(-38deg)}
+.side.l .fan::after{background:linear-gradient(90deg,rgba(20,10,2,.8),rgba(20,10,2,.12))}
+.side.r .fan{left:100%;transform-origin:0 50%;transform:rotateY(38deg)}
+.side.r .fan::after{background:linear-gradient(270deg,rgba(20,10,2,.8),rgba(20,10,2,.25))}
+.side .top{position:absolute;inset:0;overflow:hidden;cursor:pointer;background:#e6d3a8}
+.side .top .cast{position:absolute;inset:0;pointer-events:none;z-index:5}
+
+/* 넘어가는 종이: 세로 띠로 나눠 휘게 한다 */
+#air{position:absolute;left:0;top:0;width:0;height:var(--W);pointer-events:none}
+.leaf{position:absolute;left:0;top:0;width:0;height:var(--W)}
+.strip{position:absolute;top:0;height:var(--W);transform-origin:0 50%}
+.strip .face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#e6d3a8}
+.strip .face.b{transform:rotateY(180deg)}
+.strip .face .pg{position:absolute;top:0}
+.strip .face .sh,.strip .face .hl{position:absolute;inset:0;pointer-events:none}
+
+/* ---------- 쪽 ---------- */
+.pg{position:absolute;left:0;top:0;width:var(--W);height:var(--W);overflow:hidden;container-type:inline-size;background:#e6d3a8;color:var(--ink)}
+.pg::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:4}
+.pg.L::after{background:linear-gradient(270deg,rgba(34,18,4,.58),rgba(34,18,4,.24) 2.4%,rgba(34,18,4,.08) 7%,transparent 14%)}
+.pg.R::after{background:linear-gradient(90deg,rgba(34,18,4,.58),rgba(34,18,4,.24) 2.4%,rgba(34,18,4,.08) 7%,transparent 14%)}
+.pg.cover::after,.pg.back::after{display:none}
+
+/* 양피지 */
+.pg.paper::before{content:"";position:absolute;inset:0;background:url(../tex/parch.jpg) center/cover}
+.pg.paper.R::before{transform:rotate(180deg)}
+
+/* 글 쪽 */
+.words .t{position:absolute;left:13cqw;right:11.5cqw;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;padding-bottom:4cqw}
+.words .t .in{font-size:3.5cqw;line-height:1.8;word-break:keep-all}
+.words.long .t{left:10.5cqw;right:9cqw;padding-bottom:3cqw}
+.words.long .t .in{line-height:1.68}
+.s{display:inline-block;max-width:100%;text-indent:0;text-wrap:balance;vertical-align:top}
+.c{display:inline-block;max-width:100%;vertical-align:top;text-indent:0}
+.nb{white-space:nowrap}
+.words p{margin:0 0 .62em}.words p:last-child{margin-bottom:0}
+.words .n{color:var(--ink)}
+.words .n,.words .th{-webkit-text-stroke:.016em currentColor}
+.words .d{color:var(--ink-deep);font-size:1.06em;-webkit-text-stroke:.04em var(--ink-deep)}
+.words .d > .s:first-child > .c:first-child{text-indent:-.68em}
+.words .th{color:var(--ink-blue)}
+.words .th > .s:first-child > .c:first-child{text-indent:-.36em}
+.folio{position:absolute;left:0;right:0;bottom:5.4cqw;text-align:center;font-family:var(--latin);font-style:italic;font-size:2.7cqw;color:#7d5a2a;z-index:2}
+.folio::before,.folio::after{content:"";display:inline-block;width:5cqw;height:1px;background:linear-gradient(90deg,transparent,#9a7436);vertical-align:middle;margin:0 1.6cqw}
+.folio::after{transform:scaleX(-1)}
+
+/* 그림 쪽: 금선 테두리를 두른 삽화 */
+.plate{background:#0d0906}
+.plate .art{position:absolute;inset:0;background-size:cover;background-position:center}
+.plate.half-l .art{background-size:200% 100%;background-position:left center}
+.plate.half-r .art{background-size:200% 100%;background-position:right center}
+.plate .age{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 7cqw rgba(30,16,4,.5);z-index:1}
+.plate .rim{position:absolute;inset:2.3cqw;border:.16cqw solid rgba(227,194,122,.72);outline:.08cqw solid rgba(227,194,122,.4);outline-offset:.55cqw;pointer-events:none;z-index:2}
+.plate.half-l .rim{right:-1cqw}.plate.half-r .rim{left:-1cqw}
+.plate.wait .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#7d5a2a;font-size:2.8cqw;z-index:2}
+.plate.wait .ph b{display:block;font-family:var(--title);font-style:italic;font-weight:400;font-size:17cqw;line-height:1;color:rgba(70,44,14,.35);margin-bottom:3cqw}
+.plate .over{position:absolute;top:7cqw;right:7.5cqw;width:70cqw;font-size:3.25cqw;line-height:1.62;word-break:keep-all;color:#2b1210;z-index:3;-webkit-text-stroke:.022em #2b1210;
+  text-shadow:0 0 1.4cqw rgba(255,226,214,.9),0 0 .5cqw rgba(255,226,214,.7)}
+.plate .over p{margin:0 0 .6em}
+
+/* 표지와 면지 */
+.pg.cover{background:#101827 url(../tex/cover.jpg) center/cover}
+.pg.back{background:#101827 url(../tex/back.jpg) center/cover}
+.pg.endp{background:#121c3c url(../tex/endp.jpg) center/cover}
+.pg.endp.R{background-position:60% 40%;background-size:118%}
+.glint{position:absolute;inset:0;pointer-events:none;mix-blend-mode:soft-light;opacity:calc(var(--g,.3)*.95);
+  background:linear-gradient(105deg,transparent 30%,rgba(255,236,190,.85) 50%,transparent 70%);background-size:260% 100%;background-position:calc(120% - var(--g,.3)*140%) 0}
+
+/* 속표지, 제사, 판권 */
+.orn{position:absolute;left:50%;width:22cqw;height:3cqw;margin-left:-11cqw;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 30'><g fill='none' stroke='%239a7436' stroke-width='1.2' stroke-linecap='round'><path d='M6 15h78M136 15h78'/><path d='M84 15c6-9 12-9 16 0-4 9-10 9-16 0zM136 15c-6-9-12-9-16 0 4 9 10 9 16 0z'/></g><path fill='%239a7436' d='M110 3l3 9 9 3-9 3-3 9-3-9-9-3 9-3z'/></svg>") center/contain no-repeat}
+.title h2{position:absolute;left:0;right:0;top:24cqw;margin:0;text-align:center;font-family:var(--title);font-style:italic;font-weight:400;font-size:10.6cqw;line-height:1.02;color:var(--ink-deep);z-index:2}
+.title .orn{top:50.5cqw}
+.title .sub{position:absolute;left:0;right:0;top:57cqw;text-align:center;font-size:4.1cqw;letter-spacing:.06em;color:var(--ink);z-index:2}
+.title .by{position:absolute;left:0;right:0;bottom:13cqw;text-align:center;font-size:2.9cqw;letter-spacing:.12em;color:#6b4a1f;z-index:2}
+.epi .in{position:absolute;left:0;right:0;top:33cqw;text-align:center;font-family:var(--latin);font-style:italic;font-size:3.5cqw;line-height:1.7;color:var(--ink);z-index:2}
+.epi .in span{display:block}
+.epi .orn{top:25cqw}
+.epi .src{font-family:var(--kr);font-style:normal;font-size:2.4cqw;color:#7d5a2a;margin-top:1.8em;line-height:1.6}
+.colo .in{position:absolute;left:0;right:0;bottom:17cqw;text-align:center;font-size:2.7cqw;line-height:1.9;color:#5a3d18;z-index:2}
+.colo .in b{display:block;font-family:var(--title);font-style:italic;font-weight:400;font-size:4.4cqw;color:var(--ink-deep);margin-bottom:.8em}
+.colo .orn{bottom:43cqw}
+
+/* 글 쪽을 그림으로 구운 것 (발표 컴퓨터에 글꼴이 없어도 같은 글씨로 보이게) */
+.pg.baked .art{position:absolute;inset:0;background-size:cover;background-position:center}
+/* 굽는 화면: 한 쪽만 창에 가득, 가운데 골 그늘은 빼고 */
+body.bake #room{display:none}
+body.bake #bakebox{position:fixed;inset:0;--W:100vw}
+body.bake #bakebox .pg::after{display:none}
+
+/* 빛 먼지와 금가루 */
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+#veil{position:absolute;inset:0;background:#000;pointer-events:none;z-index:8;opacity:1;transition:opacity 1.6s ease-out}
+#veil.off{opacity:0}
+
+/* 아래 조작부 */
+#ui{position:absolute;left:0;right:0;bottom:0;height:72px;padding:10px 28px 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;color:var(--ui);z-index:10;
+  background:linear-gradient(180deg,transparent,rgba(3,3,5,.78))}
+#ui .name{font-family:var(--latin);font-style:italic;font-size:17px;color:#bfa873}
+#nav{display:flex;align-items:center;gap:12px}
+#ui button{height:44px;min-width:44px;display:grid;place-items:center;border-radius:22px;color:#ead9b2;transition:background .18s,color .18s,opacity .18s}
+#ui button:hover{background:rgba(227,194,122,.14);color:#fff6e0}
+#ui button:active{background:rgba(227,194,122,.22)}
+#ui button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#ui button:disabled{opacity:.25;cursor:default;background:none}
+#where{min-width:112px;text-align:center;font-size:19px;color:#f0dfb8;font-variant-numeric:tabular-nums}
+#where i{font-style:normal;color:#9c875c}
+#tools{justify-self:end;display:flex;gap:4px}
+#tools button[aria-pressed=false]{color:#8c7a55}
+#tools button[aria-pressed=false] .on{display:none}
+#tools button[aria-pressed=true] .off{display:none}
+svg{display:block}
+@media (max-width:700px){#ui .name{display:none}#ui{grid-template-columns:0 1fr auto;padding:10px 10px 0}}
